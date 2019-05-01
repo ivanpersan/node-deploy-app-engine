@@ -1,15 +1,18 @@
 const express = require('express');
 const app = express();
 const puppeteer = require('puppeteer');
+const bodyParser = require('body-parser');
 
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.post('/', async (req, res) => {
   const browser = await puppeteer.launch({headless: true, args:['--no-sandbox']});
   const page = await configurePage(browser);
   await page.goto('http://www.example.org/');  
   const imageBuffer = await page.screenshot();
   browser.close(); 
-  res.set('Content-Type', 'image/png');
-  res.send(imageBuffer);
+  res.set('Content-Type', 'application/json');
+  res.send(req.body);
 });
 
 const server = app.listen(process.env.PORT || 8080, err => {
